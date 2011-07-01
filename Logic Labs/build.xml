@@ -1,0 +1,13 @@
+<project name="Logic Labs Server">
+	<taskdef name="deploy" classname="org.apache.catalina.ant.DeployTask" />
+	<taskdef name="list" classname="org.apache.catalina.ant.ListTask" />
+	<taskdef name="reload" classname="org.apache.catalina.ant.ReloadTask" />
+	<taskdef name="resources" classname="org.apache.catalina.ant.ResourcesTask" />
+	<taskdef name="roles" classname="org.apache.catalina.ant.RolesTask" />
+	<taskdef name="start" classname="org.apache.catalina.ant.StartTask" />
+	<taskdef name="stop" classname="org.apache.catalina.ant.StopTask" />
+	<taskdef name="undeploy" classname="org.apache.catalina.ant.UndeployTask" />
+	<target name="deploydemowar">
+		<copy file="../trunk/BimServer/build/builds/bimserver-${version}.war" tofile="/var/www/bimserver.logic-labs.nl/ROOT.war"/>
+	</target>
+</project>

@@ -23,6 +23,7 @@
 <div class="content">
 <h1>Settings</h1>
 <%
+	if (loginManager.getService().isLoggedIn() && loginManager.getUserType() == SUserType.ADMIN) {
 	ServiceInterface service = loginManager.getService();
 	if (request.getParameter("action") != null) {
 		String action = request.getParameter("action");
@@ -39,7 +40,7 @@
 %>
 <div class="tabber" id="settingstabber">
 <div class="tabbertab" id="ignorefilestab" title="Guidance Providers">
-<a href="addignorefile.jsp">Add Guidance Provider</a>
+<a href="addguidanceprovider.jsp">Add Guidance Provider</a>
 <table class="formatted">
 <tr><th>Name</th><th>Serializers</th><th>Actions</th></tr>
 <%
@@ -68,7 +69,7 @@
 		}
 %>
 	<tr>
-		<td><%=serializer.getName() %></td>
+		<td><a href="serializer.jsp?name=<%=serializer.getName()%>"><%=serializer.getName() %></a></td>
 		<td><%=serializer.getDescription() %></td>
 		<td><%=serializer.getClassName() %></td>
 		<td><%=serializer.getContentType() %></td>
@@ -95,4 +96,9 @@
 </table>
 </div>
 </div>
+<%
+	} else {
+		out.println("Insufficient rights");
+	}
+%>
 <%@ include file="footer.jsp"%>

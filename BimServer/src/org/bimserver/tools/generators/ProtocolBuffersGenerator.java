@@ -44,16 +44,16 @@ public class ProtocolBuffersGenerator {
 	}
 
 	public void start() {
-		File protoFile = new File("../BimWebServer/build/pb/service.proto");
+		File protoFile = new File("../Builds/build/pb/service.proto");
 		generateProtoFile(protoFile);
 		try {
-			FileUtils.copyFile(protoFile, new File("../BimWebServer/build/targets/shared/service.proto"));
+			FileUtils.copyFile(protoFile, new File("../Builds/build/targets/shared/service.proto"));
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		File destDir = new File("generated");
-		File protoDir = new File("../BimWebServer/build/pb");
-		File execFile = new File("../BimWebServer/build/pb/protoc.exe");
+		File destDir = new File("../BimServer/generated");
+		File protoDir = new File("../Builds//build/pb");
+		File execFile = new File("../Builds/build/pb/protoc.exe");
 		try {
 			ProcessBuilder processBuilder = new ProcessBuilder(execFile.getAbsolutePath(), "-I=" + protoDir.getAbsolutePath(), "--java_out=" + destDir.getAbsolutePath(), protoFile
 					.getAbsolutePath());
@@ -181,7 +181,7 @@ public class ProtocolBuffersGenerator {
 						out.println("\t\t\trequestBuilder.set" + StringUtils.firstUpperCase(paramName) + "(" + paramName + ");");
 					} else if (parameterType.isEnum()) {
 						out.println("\t\t\trequestBuilder.set" + StringUtils.firstUpperCase(paramName) + "(Service." + parameterType.getSimpleName() + ".values()[" + paramName + ".ordinal()]);");
-					} else if (parameterType.isPrimitive() || parameterType == String.class) {
+					} else if (isPrimitive(parameterType) || parameterType == String.class) {
 						out.println("\t\t\trequestBuilder.set" + StringUtils.firstUpperCase(paramName) + "(" + paramName + ");");
 					} else {
 						out.println("\t\t\tService." + parameterType.getSimpleName() + ".Builder newVal = " + parameterType.getSimpleName() + ".newBuilder();");
@@ -335,7 +335,7 @@ public class ProtocolBuffersGenerator {
 		} else if (type == Integer.class || type == int.class) {
 			return "0";
 		} else if (type == Long.class || type == long.class) {
-			return "0";
+			return "0L";
 		} else if (type.isEnum()) {
 			return "null";
 		} else {
@@ -448,7 +448,7 @@ public class ProtocolBuffersGenerator {
 		messageBuilder.append("message " + clazz.getSimpleName() + " {\n");
 		int counter = 1;
 		for (Method method : clazz.getMethods()) {
-			if (method.getName().startsWith("get") && method.getName().length() > 3 && !methodsToIgnore.contains(method.getName())) {
+			if (method.getName().startsWith("get") && method.getName().length() > 3 && !methodsToIgnore.contains(method.getName()) && method.getParameterTypes().length == 0) {
 				boolean aggregate = method.getReturnType().isAssignableFrom(List.class) || method.getReturnType().isAssignableFrom(Set.class);
 				messageBuilder.append("\t");
 				if (aggregate) {

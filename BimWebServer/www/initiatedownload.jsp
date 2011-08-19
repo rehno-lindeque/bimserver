@@ -53,6 +53,8 @@
 
 <div id="progressBar<%=longActionId%>">
 </div>
+<span id="statusfield<%=longActionId%>">
+</span>
 
 <script>
 	var downloadUpdateFunctionHandle;
@@ -67,11 +69,12 @@
 			success:
 				function(data){
 					$("#progressBar<%=longActionId%>").progressbar("value", data.progress);
+					$("#statusfield<%=longActionId%>").html("<nobr>Preparing (" + data.progress + "%)</nobr>");
 					if (data.progress == 100) {
 						clearInterval(downloadUpdateFunctionHandle);
 						$("#progressBar<%=longActionId%>").hide();
-//						$("#progressBar<%=longActionId%>").parent().append("<a id='downloadlink' href='download?longActionId=<%=longActionId%>&zip=<%=zip%>'><label id='downloadlinkclick' for='downloadlink'>Download</label></a>");
-						window.location = 'download?longActionId=<%=longActionId%>&zip=<%=zip%>&serializerName=<%=serializerName%>';
+						$("#statusfield<%=longActionId%>").hide();
+						window.location = 'download?longActionId=<%=longActionId%><%=(zip == null ? "" : ("&zip=" + zip))%>&serializerName=<%=serializerName%>';
 					}
 				},
 			data: {	longActionId: '<%=longActionId%>' ,
@@ -82,6 +85,7 @@
 
 	$(document).ready(function() {
 		$("#progressBar<%=longActionId%>").progressbar({value: <%=las.getProgress()%>});
+		$("#statusfield<%=longActionId%>").html("<nobr>Preparing (" + <%=las.getProgress()%> + "%)</nobr>");
 		downloadUpdateFunctionHandle = window.setInterval(downloadUpdateFunction, 1000);
 		downloadUpdateFunction();
 	});

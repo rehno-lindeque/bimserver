@@ -72,8 +72,6 @@ public class FailSafeIfcEngine implements IfcEngine {
 			}
 			command.append(" -classpath ");
 			command.append("\"");
-			command.append(System.getProperty("java.class.path"));
-			command.append(File.pathSeparator);
 			if (classPath != null) {
 				File file = new File(classPath);
 				if (file.isDirectory()) {
@@ -93,7 +91,7 @@ public class FailSafeIfcEngine implements IfcEngine {
 			} else {
 				command.append(" " + schemaFile.getAbsolutePath());
 			}
-			LOGGER.error(command.toString());
+			LOGGER.info(command.toString());
 			process = Runtime.getRuntime().exec(command.toString());
 			in = new DataInputStream(new BufferedInputStream(process.getInputStream()));
 			out = new DataOutputStream(new BufferedOutputStream(process.getOutputStream()));

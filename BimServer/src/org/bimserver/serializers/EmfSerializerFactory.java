@@ -21,6 +21,7 @@ import org.bimserver.plugins.serializers.IfcModelInterface;
 import org.bimserver.plugins.serializers.ProjectInfo;
 import org.bimserver.plugins.serializers.SerializerException;
 import org.bimserver.plugins.serializers.SerializerPlugin;
+import org.bimserver.shared.SSerializerPluginDescriptor;
 
 public class EmfSerializerFactory {
 	private PluginManager pluginManager;
@@ -34,12 +35,17 @@ public class EmfSerializerFactory {
 		this.bimDatabase = bimDatabase;
 	}
 
-	public Set<String> getAllSerializerClassNames() {
-		Set<String> classNames = new HashSet<String>();
+	public Set<SSerializerPluginDescriptor> getAllSerializerPluginDescriptors() {
+		Set<SSerializerPluginDescriptor> descriptors = new HashSet<SSerializerPluginDescriptor>();
 		for (SerializerPlugin serializerPlugin : pluginManager.getAllSerializerPlugins(true)) {
-			classNames.add(serializerPlugin.getName());
+			SSerializerPluginDescriptor descriptor = new SSerializerPluginDescriptor();
+			descriptor.setDefaultContentType(serializerPlugin.getDefaultContentType());
+			descriptor.setDefaultExtension(serializerPlugin.getDefaultExtension());
+			descriptor.setDefaultName(serializerPlugin.getDefaultSerializerName());
+			descriptor.setPluginClassName(serializerPlugin.getName());
+			descriptors.add(descriptor);
 		}
-		return classNames;
+		return descriptors;
 	}
 
 	public EmfSerializer create(Project project, User user, IfcModelInterface model, DownloadParameters downloadParameters) throws SerializerException {
@@ -62,6 +68,38 @@ public class EmfSerializerFactory {
 					serializer.init(model, projectInfo, pluginManager);
 					return serializer;
 				}
+			}
+		} catch (BimDatabaseException e) {
+			e.printStackTrace();
+		} catch (BimDeadlockException e) {
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+		return null;
+	}
+
+	public SSerializerPluginDescriptor getSerializerPluginDescriptor(String type) {
+		for (SerializerPlugin serializerPlugin : pluginManager.getAllSerializerPlugins(true)) {
+			if (serializerPlugin.getName().equals(type)) {
+				SSerializerPluginDescriptor descriptor = new SSerializerPluginDescriptor();
+				descriptor.setDefaultContentType(serializerPlugin.getDefaultContentType());
+				descriptor.setDefaultExtension(serializerPlugin.getDefaultExtension());
+				descriptor.setDefaultName(serializerPlugin.getDefaultSerializerName());
+				descriptor.setPluginClassName(serializerPlugin.getName());
+				return descriptor;
+			}
+		}
+		return null;
+	}
+
+	public String getExtension(String serializerName) {
+		BimDatabaseSession session = bimDatabase.createReadOnlySession();
+		try {
+			Condition condition = new AttributeCondition(StorePackage.eINSTANCE.getSerializer_Name(), new StringLiteral(serializerName));
+			Serializer found = session.querySingle(condition, Serializer.class, false);
+			if (found != null) {
+				return found.getExtension();
 			}
 		} catch (BimDatabaseException e) {
 			e.printStackTrace();

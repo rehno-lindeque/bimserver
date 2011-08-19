@@ -1,6 +1,6 @@
 package org.bimserver.database.actions;
 
-import java.util.Collection;
+import java.util.Set;
 
 import org.bimserver.database.BimDatabaseException;
 import org.bimserver.database.BimDatabaseSession;
@@ -17,6 +17,7 @@ import org.bimserver.models.store.Revision;
 import org.bimserver.models.store.StorePackage;
 import org.bimserver.models.store.User;
 import org.bimserver.shared.UserException;
+import org.bimserver.utils.CollectionUtils;
 
 public abstract class BimDatabaseAction<T> {
 	private BimDatabaseSession bimDatabaseSession;
@@ -54,19 +55,14 @@ public abstract class BimDatabaseAction<T> {
 		return bimDatabaseSession.querySingle(condition, Project.class, false);
 	}
 
-	public Collection<Project> getProjectsByName(String projectName) throws BimDatabaseException, BimDeadlockException {
+	public Set<Project> getProjectsByName(String projectName) throws BimDatabaseException, BimDeadlockException {
 		Condition condition = new AttributeCondition(StorePackage.eINSTANCE.getProject_Name(), new StringLiteral(projectName));
-		return (Collection<Project>) bimDatabaseSession.query(condition, Project.class, false).values();
+		return CollectionUtils.mapToSet(bimDatabaseSession.query(condition, Project.class, false));
 	}
 
 	public User getUserByUserName(String username) throws BimDatabaseException, BimDeadlockException {
 		Condition condition = new AttributeCondition(StorePackage.eINSTANCE.getUser_Username(), new StringLiteral(username));
 		return bimDatabaseSession.querySingle(condition, User.class, false);
-	}
-
-	public Project getProjectByName(String name) throws BimDatabaseException, BimDeadlockException {
-		Condition condition = new AttributeCondition(StorePackage.eINSTANCE.getProject_Name(), new StringLiteral(name));
-		return bimDatabaseSession.querySingle(condition, Project.class, false);
 	}
 
 	public Revision getVirtualRevision(long roid) throws BimDeadlockException, BimDatabaseException {

@@ -86,20 +86,27 @@ public class BimServer {
 	private MailSystem mailSystem;
 	private DiskCacheManager diskCacheManager;
 	private ServerInfo serverInfo = new ServerInfo();
-	private String classPath = System.getProperty("java.class.path");
 	private ServiceFactory serviceFactory;
 	private VersionChecker versionChecker;
 	private TemplateEngine templateEngine;
 	private ClashDetectionCache clashDetectionCache;
 	private CompareCache compareCache;
-	
+	private final String classPath;
+
+	private RpcServer protocolBuffersRpcServer;
+
+	public BimServer(File homeDir, ResourceFetcher resourceFetcher) {
+		this(homeDir, resourceFetcher, System.getProperty("java.class.path"));
+	}
+
 	/**
 	 * Create a new BIMserver
 	 * 
 	 * @param homeDir A directory where the user can store instance specific configuration files
 	 * @param resourceFetcher A resource fetcher
 	 */
-	public BimServer(File homeDir, ResourceFetcher resourceFetcher) {
+	public BimServer(File homeDir, ResourceFetcher resourceFetcher, String classPath) {
+		this.classPath = classPath;
 		try {
 			this.homeDir = homeDir;
 			this.resourceFetcher = resourceFetcher;
@@ -162,7 +169,7 @@ public class BimServer {
 						}
 					}
 				});
-				pluginManager.loadPlugin(GuidanceProviderPlugin.class, "Internal", new SchemaFieldGuidanceProviderPlugin());
+				pluginManager.loadPlugin(GuidanceProviderPlugin.class, "Internal", "Internal", new SchemaFieldGuidanceProviderPlugin());
 			} catch (Exception e) {
 				e.printStackTrace();
 				LOGGER.error("", e);
@@ -252,9 +259,9 @@ public class BimServer {
 		bimScheduler = new JobScheduler(this);
 		bimScheduler.start();
 
-		RpcServer rpcServer = new RpcServer(SocketRpcConnectionFactories.createServerRpcConnectionFactory(8020), Executors.newFixedThreadPool(10), false);
-		rpcServer.registerBlockingService(org.bimserver.pb.Service.ServiceInterface.newReflectiveBlockingService(org.bimserver.pb.Service.ServiceInterface.newBlockingStub(new ReflectiveRpcChannel(serviceFactory))));
-		rpcServer.startServer();
+		protocolBuffersRpcServer = new RpcServer(SocketRpcConnectionFactories.createServerRpcConnectionFactory(8020), Executors.newFixedThreadPool(10), false);
+		protocolBuffersRpcServer.registerBlockingService(org.bimserver.pb.Service.ServiceInterface.newReflectiveBlockingService(org.bimserver.pb.Service.ServiceInterface.newBlockingStub(new ReflectiveRpcChannel(serviceFactory))));
+		protocolBuffersRpcServer.startServer();
 
 //		if (serverType == ServerType.DEPLOYED_WAR) {
 //			File libDir = new File(classPath);
@@ -451,10 +458,6 @@ public class BimServer {
 		return diskCacheManager;
 	}
 
-	public void setClassPath(String classPath) {
-		this.classPath = classPath;
-	}
-	
 	public String getClassPath() {
 		return classPath;
 	}

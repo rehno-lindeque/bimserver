@@ -4,7 +4,6 @@
 	<classpathentry exported="true" kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="generated"/>
-	<classpathentry kind="src" path="expander"/>
 	<classpathentry kind="src" path="imported"/>
 	<classpathentry exported="true" kind="lib" path="lib/geoapi/geoapi-2.3-M1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/geoapi/geoapi-pending-2.3-M1.jar"/>
@@ -90,5 +89,6 @@
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/Store"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/Utils"/>
 	<classpathentry exported="true" kind="lib" path="lib/cxf/cxf-2.4.1.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/XsltSerializer"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

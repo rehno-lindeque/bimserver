@@ -43,14 +43,6 @@ public class SceneJSSerializerPlugin implements SerializerPlugin {
 	}
 
 	@Override
-	public Set<Class<? extends Plugin>> getRequiredPlugins() {
-		Set<Class<? extends Plugin>> set = new HashSet<Class<? extends Plugin>>();
-		set.add(SchemaPlugin.class);
-		set.add(IfcEnginePlugin.class);
-		return set;
-	}
-
-	@Override
 	public String getDefaultSerializerName() {
 		return "SceneJS";
 	}

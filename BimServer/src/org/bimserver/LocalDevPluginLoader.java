@@ -19,11 +19,12 @@ public class LocalDevPluginLoader {
 		pluginManager.loadPluginsFromEclipseProject(new File("../FileBasedGuidanceProvider"));
 		pluginManager.loadPluginsFromEclipseProject(new File("../Cobie2Serializer"));
 		pluginManager.loadPluginsFromEclipseProject(new File("../Report1Serializer"));
+		pluginManager.loadPluginsFromEclipseProject(new File("../DeserializerExample"));
 	}
 	
 	public static PluginManager createPluginManager() throws PluginException {
 		ResourceFetcher resourceFetcher = new LocalDevelopmentResourceFetcher();
-		PluginManager pluginManager = new PluginManager(resourceFetcher, null, null);
+		PluginManager pluginManager = new PluginManager(resourceFetcher, new File("home"), null);
 		loadPlugins(pluginManager);
 		pluginManager.initAllLoadedPlugins();
 		return pluginManager;

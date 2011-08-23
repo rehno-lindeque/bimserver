@@ -4,79 +4,29 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.bimserver.emf.IdEObject;
 import org.bimserver.ifc.IfcModel;
-import org.bimserver.models.ifc2x3.IfcBuildingElementProxy;
-import org.bimserver.models.ifc2x3.IfcColourOrFactor;
-import org.bimserver.models.ifc2x3.IfcColourRgb;
-import org.bimserver.models.ifc2x3.IfcColumn;
-import org.bimserver.models.ifc2x3.IfcCurtainWall;
-import org.bimserver.models.ifc2x3.IfcDoor;
-import org.bimserver.models.ifc2x3.IfcFlowSegment;
-import org.bimserver.models.ifc2x3.IfcFurnishingElement;
-import org.bimserver.models.ifc2x3.IfcMaterial;
-import org.bimserver.models.ifc2x3.IfcMaterialLayer;
-import org.bimserver.models.ifc2x3.IfcMaterialLayerSet;
-import org.bimserver.models.ifc2x3.IfcMaterialLayerSetUsage;
-import org.bimserver.models.ifc2x3.IfcMaterialSelect;
-import org.bimserver.models.ifc2x3.IfcMember;
-import org.bimserver.models.ifc2x3.IfcObjectDefinition;
-import org.bimserver.models.ifc2x3.IfcPlate;
-import org.bimserver.models.ifc2x3.IfcPresentationStyleAssignment;
-import org.bimserver.models.ifc2x3.IfcPresentationStyleSelect;
-import org.bimserver.models.ifc2x3.IfcProduct;
-import org.bimserver.models.ifc2x3.IfcProductDefinitionShape;
-import org.bimserver.models.ifc2x3.IfcProductRepresentation;
-import org.bimserver.models.ifc2x3.IfcProject;
-import org.bimserver.models.ifc2x3.IfcRailing;
-import org.bimserver.models.ifc2x3.IfcRelAssociatesMaterial;
-import org.bimserver.models.ifc2x3.IfcRelDecomposes;
-import org.bimserver.models.ifc2x3.IfcRepresentation;
-import org.bimserver.models.ifc2x3.IfcRepresentationItem;
-import org.bimserver.models.ifc2x3.IfcRoof;
-import org.bimserver.models.ifc2x3.IfcSIUnit;
-import org.bimserver.models.ifc2x3.IfcShapeRepresentation;
-import org.bimserver.models.ifc2x3.IfcSlab;
-import org.bimserver.models.ifc2x3.IfcSlabTypeEnum;
-import org.bimserver.models.ifc2x3.IfcStair;
-import org.bimserver.models.ifc2x3.IfcStairFlight;
-import org.bimserver.models.ifc2x3.IfcStyledItem;
-import org.bimserver.models.ifc2x3.IfcSurfaceStyle;
-import org.bimserver.models.ifc2x3.IfcSurfaceStyleElementSelect;
-import org.bimserver.models.ifc2x3.IfcSurfaceStyleRendering;
-import org.bimserver.models.ifc2x3.IfcUnit;
-import org.bimserver.models.ifc2x3.IfcUnitAssignment;
-import org.bimserver.models.ifc2x3.IfcUnitEnum;
-import org.bimserver.models.ifc2x3.IfcWall;
-import org.bimserver.models.ifc2x3.IfcWallStandardCase;
-import org.bimserver.models.ifc2x3.IfcWindow;
-import org.bimserver.models.store.SIPrefix;
 import org.bimserver.plugins.PluginException;
 import org.bimserver.plugins.PluginManager;
 import org.bimserver.plugins.ifcengine.IfcEngine;
 import org.bimserver.plugins.ifcengine.IfcEngineException;
 import org.bimserver.plugins.ifcengine.IfcEngineGeometry;
-import org.bimserver.plugins.ifcengine.IfcEngineInstance;
-import org.bimserver.plugins.ifcengine.IfcEngineInstanceVisualisationProperties;
 import org.bimserver.plugins.ifcengine.IfcEngineModel;
 import org.bimserver.plugins.serializers.BimModelSerializer;
 import org.bimserver.plugins.serializers.EmfSerializer;
 import org.bimserver.plugins.serializers.IfcModelInterface;
 import org.bimserver.plugins.serializers.ProjectInfo;
 import org.bimserver.plugins.serializers.SerializerException;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SceneJSSerializer extends BimModelSerializer {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ColladaSerializer.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SceneJSSerializer.class);
 	private IfcEngine ifcEngine;
 	private Map<String, Set<String>> converted = new HashMap<String, Set<String>>();
 	private List<String> surfaceStyleIds;
@@ -123,11 +73,11 @@ public class SceneJSSerializer extends BimModelSerializer {
 
 				writer.println("{");
 				//writer.indent();
-				out.println("type: 'library',");
+//				out.println("type: 'library',");
 				writer.println("nodes: [");
 				//writer.indent()
 				writeMaterials(writer);
-				writeGeometries(writer);
+//				writeGeometries(writer);
 				//writer.undent();
 				writer.println("],");
 
@@ -159,8 +109,8 @@ public class SceneJSSerializer extends BimModelSerializer {
 
 	private void writeAssets(PrintWriter writer) {
 		writer.println("/* Author:      " + getProjectInfo().getAuthorName());
-		writer.println("   Description: " + getProjectInfo().getDescription()
-		writer.println("*/
+		writer.println("   Description: " + getProjectInfo().getDescription());
+		writer.println("*/");
 
 		/*if (lengthUnitPrefix == null) {
 			writer.println("   Unit: 1 meter");
@@ -372,60 +322,6 @@ public class SceneJSSerializer extends BimModelSerializer {
 		out.println("        </effect>");*/
 	}
 
-	private void writeGeometries(PrintWriter writer) throws IfcEngineException, SerializerException {
-		for (IfcRoof ifcRoof : model.getAll(IfcRoof.class)) {
-			setGeometry(out, ifcRoof, ifcRoof.getGlobalId().getWrappedValue(), "Roof");
-		}
-		for (IfcSlab ifcSlab : model.getAll(IfcSlab.class)) {
-			if (ifcSlab.getPredefinedType() == IfcSlabTypeEnum.ROOF) {
-				setGeometry(out, ifcSlab, ifcSlab.getGlobalId().getWrappedValue(), "Roof");
-			} else {
-				setGeometry(out, ifcSlab, ifcSlab.getGlobalId().getWrappedValue(), "Slab");
-			}
-		}
-		for (IfcWindow ifcWindow : model.getAll(IfcWindow.class)) {
-			setGeometry(out, ifcWindow, ifcWindow.getGlobalId().getWrappedValue(), "Window");
-		}
-		for (IfcDoor ifcDoor : model.getAll(IfcDoor.class)) {
-			setGeometry(out, ifcDoor, ifcDoor.getGlobalId().getWrappedValue(), "Door");
-		}
-		for (IfcWall ifcWall : model.getAll(IfcWall.class)) {
-			setGeometry(out, ifcWall, ifcWall.getGlobalId().getWrappedValue(), "Wall");
-		}
-		for (IfcStair ifcStair : model.getAll(IfcStair.class)) {
-			setGeometry(out, ifcStair, ifcStair.getGlobalId().getWrappedValue(), "Stair");
-		}
-		for (IfcStairFlight ifcStairFlight : model.getAll(IfcStairFlight.class)) {
-			setGeometry(out, ifcStairFlight, ifcStairFlight.getGlobalId().getWrappedValue(), "StairFlight");
-		}
-		for (IfcFlowSegment ifcFlowSegment : model.getAll(IfcFlowSegment.class)) {
-			setGeometry(out, ifcFlowSegment, ifcFlowSegment.getGlobalId().getWrappedValue(), "FlowSegment");
-		}
-		for (IfcFurnishingElement ifcFurnishingElement : model.getAll(IfcFurnishingElement.class)) {
-			setGeometry(out, ifcFurnishingElement, ifcFurnishingElement.getGlobalId().getWrappedValue(), "FurnishingElement");
-		}
-		for (IfcPlate ifcPlate : model.getAll(IfcPlate.class)) {
-			setGeometry(out, ifcPlate, ifcPlate.getGlobalId().getWrappedValue(), "Plate");
-		}
-		for (IfcMember ifcMember : model.getAll(IfcMember.class)) {
-			setGeometry(out, ifcMember, ifcMember.getGlobalId().getWrappedValue(), "Member");
-		}
-		for (IfcWallStandardCase ifcWall : model.getAll(IfcWallStandardCase.class)) {
-			setGeometry(out, ifcWall, ifcWall.getGlobalId().getWrappedValue(), "WallStandardCase");
-		}
-		for (IfcCurtainWall ifcCurtainWall : model.getAll(IfcCurtainWall.class)) {
-			setGeometry(out, ifcCurtainWall, ifcCurtainWall.getGlobalId().getWrappedValue(), "CurtainWall");
-		}
-		for (IfcRailing ifcRailing : model.getAll(IfcRailing.class)) {
-			setGeometry(out, ifcRailing, ifcRailing.getGlobalId().getWrappedValue(), "Railing");
-		}
-		for (IfcColumn ifcColumn : model.getAll(IfcColumn.class)) {
-			setGeometry(out, ifcColumn, ifcColumn.getGlobalId().getWrappedValue(), "Column");
-		}
-		for (IfcBuildingElementProxy ifcBuildingElementProxy : model.getAll(IfcBuildingElementProxy.class)) {
-			setGeometry(out, ifcBuildingElementProxy, ifcBuildingElementProxy.getGlobalId().getWrappedValue(), "BuildingElementProxy");
-		}
-	}
 
 	private void setGeometry(PrintWriter writer, IdEObject ifcRootObject, String id, String material) throws IfcEngineException, SerializerException {
 		id = id.replace('$', '-'); // Remove the $ character from geometry id's.
@@ -523,7 +419,7 @@ public class SceneJSSerializer extends BimModelSerializer {
 		}
 		converted.get(material).add(id);*/
 
-		IfcModel ifcModel = new IfcModel();
+		IfcModelInterface ifcModel = new IfcModel();
 		convertToSubset(ifcRootObject.eClass(), ifcRootObject, ifcModel, new HashMap<EObject, EObject>());
 		EmfSerializer serializer = getPluginManager().requireIfcStepSerializer();
 		serializer.init(ifcModel, getProjectInfo(), getPluginManager());
@@ -549,7 +445,7 @@ public class SceneJSSerializer extends BimModelSerializer {
 					for (int i = 0; i < geometry.getNrNormals(); i++) {
 						// Normals will also be scaled in Google Earth ...
 						//out.print(geometry.getNormal(i) * 1000.0f + " ");
-						out.print(geometry.getNormal(i) + ",");
+//						out.print(geometry.getNormal(i) + ",");
 					}
 					writer.println("],");
 
@@ -632,35 +528,6 @@ public class SceneJSSerializer extends BimModelSerializer {
 		out.println("            </node>");
 		out.println("        </visual_scene>");
 		out.println("    </library_visual_scenes>");*/
-	}
-
-	private String fitNameForQualifiedName(String name) {
-		/*
-		if (name == null) {
-			return "";
-		}
-		StringBuilder builder = new StringBuilder(name);
-		int indexOfSpace = builder.indexOf(" ");
-		while (indexOfSpace >= 0) {
-			builder.deleteCharAt(indexOfSpace);
-			indexOfSpace = builder.indexOf(" ");
-		}
-		indexOfSpace = builder.indexOf(",");
-		while (indexOfSpace >= 0) {
-			builder.setCharAt(indexOfSpace, '_');
-			indexOfSpace = builder.indexOf(",");
-		}
-		indexOfSpace = builder.indexOf("/");
-		while (indexOfSpace >= 0) {
-			builder.setCharAt(indexOfSpace, '_');
-			indexOfSpace = builder.indexOf("/");
-		}
-		indexOfSpace = builder.indexOf("*");
-		while (indexOfSpace >= 0) {
-			builder.setCharAt(indexOfSpace, '_');
-			indexOfSpace = builder.indexOf("/");
-		}
-		return builder.toString();*/
 	}
 
 	private void writeLights(PrintWriter writer) {

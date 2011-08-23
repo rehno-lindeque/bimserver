@@ -3,8 +3,7 @@
 <%@page import="java.util.TreeSet"%>
 <%@page import="org.bimserver.interfaces.objects.SCheckinState"%>
 <%@page import="org.bimserver.interfaces.objects.SCheckout"%>
-<%@page
-	import="org.bimserver.interfaces.objects.SClashDetectionSettings"%>
+<%@page	import="org.bimserver.interfaces.objects.SClashDetectionSettings"%>
 <%@page import="org.bimserver.interfaces.objects.SGeoTag"%>
 <%@page import="org.bimserver.interfaces.objects.SObjectState"%>
 <%@page import="org.bimserver.interfaces.objects.SProject"%>
@@ -748,7 +747,7 @@
 				} else {
 			%>
 			<div class="none">
-				No revisions<%=userHasCheckinRights ? ", upload an IFC file"
+				No revisions<%=userHasCheckinRights ? ", upload a file"
 								: ""%></div>
 			<%
 				}
@@ -848,8 +847,7 @@
 			title="Authorized users<%=users.size() == 0 ? "" : " (" + users.size()
 							+ ")"%>">
 			<%
-				if (nonAuthorizedUsers.size() > 0
-								&& hasUserManagementRights) {
+				if (nonAuthorizedUsers.size() > 0 && hasUserManagementRights) {
 			%>
 			<form method="post" action="addusertoproject.jsp">
 				<select name="uoid">
@@ -866,6 +864,9 @@
 					type="submit" value="Add" />
 			</form>
 
+			<% 	
+				if (loginManager.getService().isSettingAllowSelfRegistration()) {
+			 %>
 			<form method="post" action="addusertoproject.jsp">
 				<input type="hidden" name="poid" value="<%=poid%>" />
 				<input type="hidden" name="type" value="invitedUser" /> Invite a
@@ -875,6 +876,7 @@
 					<input type="submit" value="Invite" />
 			</form>
 			<%
+					}
 				}
 			%>
 			<%
@@ -1094,8 +1096,7 @@
 			$("#compareform").hide();
 			$("#compareajaxloader").show();
 		});
-		$("#browserajaxlink").click(fun
-		ction() {
+		$("#browserajaxlink").click(function() {
 												$("#browserajaxloader").show();
 												$("#browser")
 														.load(

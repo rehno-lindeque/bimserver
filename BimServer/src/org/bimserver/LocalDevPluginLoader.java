@@ -11,6 +11,7 @@ public class LocalDevPluginLoader {
 	public static void loadPlugins(PluginManager pluginManager) throws PluginException {
 		pluginManager.loadPluginsFromEclipseProject(new File("../CityGML"));
 		pluginManager.loadPluginsFromEclipseProject(new File("../Collada"));
+		pluginManager.loadPluginsFromEclipseProject(new File("../SceneJS"));
 		pluginManager.loadPluginsFromEclipseProject(new File("../IfcPlugins"));
 		pluginManager.loadPluginsFromEclipseProject(new File("../MiscSerializers"));
 		pluginManager.loadPluginsFromEclipseProject(new File("../O3d"));
@@ -19,7 +20,11 @@ public class LocalDevPluginLoader {
 		pluginManager.loadPluginsFromEclipseProject(new File("../FileBasedGuidanceProvider"));
 		pluginManager.loadPluginsFromEclipseProject(new File("../Cobie2Serializer"));
 		pluginManager.loadPluginsFromEclipseProject(new File("../Report1Serializer"));
-		pluginManager.loadPluginsFromEclipseProject(new File("../DeserializerExample"));
+		try {
+			pluginManager.loadPluginsFromEclipseProject(new File("C:\\Users\\Ruben de Laat\\git\\BIMserver\\DeserializerExample"));
+			pluginManager.loadPluginsFromEclipseProject(new File("C:\\Users\\Ruben de Laat\\git\\BIMserver\\SerializerExample"));
+		} catch (PluginException e) {
+		}
 	}
 	
 	public static PluginManager createPluginManager() throws PluginException {

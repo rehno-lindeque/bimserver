@@ -1306,7 +1306,7 @@ public class Service implements ServiceInterface {
 		BimDatabaseSession session = bimServer.getDatabase().createReadOnlySession();
 		try {
 			BimDatabaseAction<SDataObject> action = new GetDataObjectByGuidDatabaseAction(bimServer, session, accessMethod, roid, guid);
-			SDataObject dataObject = session.executeAndCommitAction(action, DEADLOCK_RETRIES);
+			SDataObject dataObject = session.executeAction(action, DEADLOCK_RETRIES);
 			return dataObject;
 		} catch (Exception e) {
 			handleException(e);
@@ -1826,7 +1826,9 @@ public class Service implements ServiceInterface {
 
 	@Override
 	public void setSettingSiteAddress(String siteAddress) throws UserException, ServerException {
-		requireAdminAuthentication();
+		if (bimServer.getServerInfo().getServerState() != ServerState.NOT_SETUP) {
+			requireAdminAuthentication();
+		}
 		Settings settings = bimServer.getSettingsManager().getSettings();
 		if (siteAddress.trim().isEmpty()) {
 			throw new UserException("Site Address cannot be empty");
@@ -1844,7 +1846,9 @@ public class Service implements ServiceInterface {
 
 	@Override
 	public void setSettingSmtpServer(String smtpServer) throws UserException, ServerException {
-		requireAdminAuthentication();
+		if (bimServer.getServerInfo().getServerState() != ServerState.NOT_SETUP) {
+			requireAdminAuthentication();
+		}
 		Settings settings = bimServer.getSettingsManager().getSettings();
 		if (smtpServer.trim().isEmpty()) {
 			throw new UserException("SMTP server address cannot be empty");

@@ -586,15 +586,20 @@ public class SceneJSSerializer extends BimModelSerializer {
 	}
 
 	private void writeVisualScenes(JsWriter writer) {
+		// Calculate the maximum ray length through the scene (using the two extreme points of the scene's bounding box)
+		float[] maxRay = new float[]{ sceneExtents.max[0] - sceneExtents.min[0], sceneExtents.max[1] - sceneExtents.min[1], sceneExtents.max[2] - sceneExtents.min[2] };
+		float maxRayLength = (float) Math.sqrt((double)(maxRay[0]*maxRay[0] + maxRay[1]*maxRay[1] + maxRay[2]*maxRay[2]));
+		
+		// Write the nodes to the stream
 		writer.writeln("{");
 		writer.indent();
 		writer.writeln("type: 'lookAt',");
 		
 		writer.writeln("eye: {");
 		writer.indent();
-		writer.writeln("x: -1000.0,");
-		writer.writeln("y: 1000.0,");
-		writer.writeln("z: 1000.0,");
+		writer.writeln("x: " + (-maxRay[0] * 0.5f) + ",");
+		writer.writeln("y: " + (maxRay[1] * 0.5f) + ",");
+		writer.writeln("z: " + (maxRay[2] * 0.5f) + ",");
 		writer.unindent();
 		writer.writeln("},"); // eye
 		
@@ -623,8 +628,8 @@ public class SceneJSSerializer extends BimModelSerializer {
 		writer.writeln("optics: {");
 		writer.indent();
 		writer.writeln("type: 'perspective',");
-		writer.writeln("far: 10000.0,");
-		writer.writeln("near: 10.0,");
+		writer.writeln("far: " + (maxRayLength * 2) + ",");
+		writer.writeln("near: " + (maxRayLength * 0.001f) + ",");
 		writer.writeln("aspect: 1.0,");
 		writer.writeln("fovy: 27.6380627952,");
 		//writer.writeln("fovy: 37.8493,");
